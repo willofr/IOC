@@ -1,0 +1,5 @@
+- name: Recherche IOC
+  hosts: all
+  #become: yes
+  roles:
+    - rechercheIOC

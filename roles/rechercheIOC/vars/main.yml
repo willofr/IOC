@@ -1,0 +1,13 @@
+---
+# vars file for rechercheIOC
+files:
+  - "CORE-2019.4.5220.20574-SolarWinds-Core-v2019.4.5220-Hotfix5.msp"
+  - "Solarwinds Worldwide, LLC"
+  - "SolarWinds.Orion.Core.BusinessLayer.dll"
+  - "OrionImprovementBusinessLayer.2.cs"
+  - "app_web_logoimagehandler.ashx.b6031896.dll"
+  - "app_web_logoimagehandler.ashx.b6031896.dll"
+  - "logoimagehandler.ashx"
+  - "toto.txt"
+  - "titi.txt"
+  

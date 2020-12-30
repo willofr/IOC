@@ -1,0 +1,10 @@
+---
+- name: "IOC | lookup for specified filename"
+  find:
+    paths: "C:"
+    patterns: "{{ files }}"
+    recurse: yes
+  register: _files
+  
+- name: "Debug | print result"
+  debug: var=_files
