@@ -1,2 +1,12 @@
 ---
 # tasks file for rechercheIOC
+- name: "Main | Recherche IOC on RedHat/CentOs/Debian family"
+  include_tasks: iocLinux.yml
+  when: (ansible_os_family == 'RedHat') or (ansible_os_family == 'Debian')
+
+- name: "Main | Recherche IOC on Windows family"
+  include_tasks: iocWin.yml
+  when: (ansible_os_family == 'Windows')
+
+- name: "Main | Afficher résultat"
+  include_tasks: results.yml

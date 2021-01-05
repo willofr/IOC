@@ -1,0 +1,131 @@
+---
+- name: "IOCLinux | lookup for specified filename"
+  find:
+    paths: "/"
+    patterns: "{{ files }}"
+    recurse: yes
+  register: _files
+  
+# - name: "Debug | print result"
+#   debug: var=_files
+  
+- name: "IOCLinux | Create list of files found"
+  set_fact:
+    _list: "{{ _files.files | map(attribute='path') | list}}"
+    
+# - name: "Debug | print result"
+#   debug: var=_list
+  
+- name: "IOCLinux | MD5 block"
+  block:
+    - name: "IOCLinux | calculate MD5"
+      stat:
+        checksum_algorithm: md5
+        path: "{{ item }}"
+      with_items: "{{ _list}}"
+      register: _md5
+
+    # - name: "Debug | print result"
+    #   debug: var=_md5
+      
+    # - name: "Debug"
+    #   debug:
+    #     msg: "{{ item.stat.path }} - {{ item.stat.checksum }}"
+    #   with_items: "{{ _md5.results }}"
+      
+    - name: "IOCLinux | Set MD5 dict"
+      set_fact:
+        _dictmd5: "{{ _dictmd5 | default({}) | combine( { item.stat.path: item.stat.checksum } ) }}"
+      with_items: "{{ _md5.results }}"
+      
+    # - name: "IOCLinux | print _dictmd5"
+    #   debug: var=_dictmd5
+
+  when: _md5checksum != None
+   
+- name: "IOCLinux | SHA256 block"
+  block:
+    - name: "IOCLinux | calculate SHA256"
+      stat:
+        checksum_algorithm: sha256
+        path: "{{ item }}"
+      with_items: "{{ _list }}"
+      register: _sha256
+
+    # - name: "Debug | print result"
+    #   debug: var=_sha256
+      
+    # - name: "Debug"
+    #   debug:
+    #     msg: "{{ item.stat.path }} - {{ item.stat.checksum }}"
+    #   with_items: "{{ _sha256.results }}"
+      
+    - name: "IOCLinux | Set SHA256 dict"
+      set_fact:
+        _dictsha256: "{{ _dictsha256 | default({}) | combine( { item.stat.path: item.stat.checksum } ) }}"
+      with_items: "{{ _sha256.results }}"
+      
+    # - name: "IOCLinux | print _dictsha256"
+    #   debug: var=_dictsha256
+    
+    # - name: "Debug | print item value"
+    #   debug:
+    #     msg: "{{ item.key }} has a checksum of {{ item.value }}"  
+    #   with_items: "{{ lookup('dict', _dictsha256) }}"
+
+  when: _sha256checksum != None
+  
+- name: "IOCLinux | SHA1 block"
+  block:
+    - name: "IOCLinux | calculate SHA1"
+      stat:
+        checksum_algorithm: sha1
+        path: "{{ item }}"
+      with_items: "{{ _list}}"
+      register: _sha1
+
+    # - name: "Debug | print result"
+    #   debug: var=_sha1
+      
+    # - name: "Debug"
+    #   debug:
+    #     msg: "{{ item.stat.path }} - {{ item.stat.checksum }}"
+    #   with_items: "{{ _sha1.results }}"
+     
+    - name: "IOCLinux | Set SHA1 dict"
+      set_fact:
+        _dictsha1: "{{ _dictsha1 | default({}) | combine( { item.stat.path: item.stat.checksum } ) }}"
+      with_items: "{{ _sha1.results }}"
+      
+    # - name: "IOCLinux | print _dictsha1"
+    #   debug: var=_dictsha1
+
+  when: _sha1checksum != None
+
+- name: "IOCLinux | set dict result for MD5 checksum"
+  set_fact:
+    _finaldict: "{{ _finaldict| default( {} ) | combine(_dictmd5 | dict2items | selectattr( 'value', 'equalto', item ) | list | items2dict) }}"
+  with_items: "{{ _md5checksum }}"
+  when: (_dictmd5 is defined) and (_dictmd5|length > 0)
+
+# - name: "debug | print _finaldict"
+#   debug: var=_finaldict
+
+- name: "IOCLinux | set dict result for SHA1 checksum"
+  set_fact:
+    _finaldict: "{{ _finaldict | default( {} ) | combine(_dictsha1 | dict2items | selectattr( 'value', 'equalto', item ) | list | items2dict) }}"
+  with_items: "{{ _sha1checksum }}"
+  when: (_dictsha1 is defined) and (_dictsha1|length > 0)
+
+# - name: "debug | print _finaldict"
+#   debug: var=_finaldict
+
+- name: "IOCLinux | set dict result for SHA256 checksum"
+  set_fact:
+    _finaldict: "{{ _finaldict| default( {} ) | combine(_dictsha256 | dict2items | selectattr( 'value', 'equalto', item ) | list | items2dict) }}"
+  with_items: "{{ _sha256checksum }}"
+  when: (_dictsha256 is defined) and (_dictsha256|length > 0)
+
+# - name: "debug | print _finaldict"
+#   debug: var=_finaldict
+

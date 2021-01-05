@@ -1,0 +1,14 @@
+---
+- name: results | negative
+  debug:
+    msg: NO IOC FOUND
+  when: (_finaldict is undefined) or (_finaldict|length == 0)
+
+- name: results | positive
+  debug:
+    msg: "!!! IOC FOUND !!!"
+  when: (_finaldict is defined) and (_finaldict|length > 0)
+
+- name: results | print _finaldict
+  debug: var=_finaldict
+  when: (_finaldict is defined) and (_finaldict|length > 0)
