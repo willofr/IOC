@@ -1,5 +1,5 @@
 ---
-- name: Get disk facts
+- name: Get disk facts # usefull only for debug
   community.windows.win_disk_facts:
   register: _diskfacts
 
